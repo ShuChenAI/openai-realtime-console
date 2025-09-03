@@ -147,6 +147,12 @@ export default function App() {
         <div className="flex items-center gap-4 w-full m-4 pb-2 border-0 border-b border-solid border-gray-200">
           <img style={{ width: "24px" }} src={logo} />
           <h1>realtime console</h1>
+          <a 
+            href="/transcribe" 
+            className="ml-auto text-sm text-blue-600 hover:underline"
+          >
+            Try Transcription →
+          </a>
         </div>
       </nav>
       <main className="absolute top-16 left-0 right-0 bottom-0">

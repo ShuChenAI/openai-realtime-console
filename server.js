@@ -8,6 +8,11 @@ app.use(express.text());
 const port = process.env.PORT || 3000;
 const apiKey = process.env.OPENAI_API_KEY;
 
+// Handle .well-known and other scanner requests before Vite
+app.use('/.well-known', (req, res) => {
+  res.status(404).send('Not found');
+});
+
 // Configure Vite middleware for React client
 const vite = await createViteServer({
   server: { middlewareMode: true },
@@ -24,6 +29,23 @@ const sessionConfig = JSON.stringify({
         voice: "marin",
       },
     },
+  },
+});
+
+const transcribeConfig = JSON.stringify({
+  expires_after: {
+    anchor: "created_at",
+    seconds: 3600
+  },
+  session: {
+    type: "transcription",
+    audio: {
+      input: {
+        transcription: {
+          model: 'gpt-4o-transcribe'  // Standard Whisper model
+        }
+      }
+    }
   },
 });
 
@@ -69,6 +91,29 @@ app.get("/token", async (req, res) => {
   } catch (error) {
     console.error("Token generation error:", error);
     res.status(500).json({ error: "Failed to generate token" });
+  }
+});
+
+// API route for transcription token generation
+app.get("/transcribe-token", async (req, res) => {
+  try {
+    const response = await fetch(
+      "https://api.openai.com/v1/realtime/client_secrets",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: transcribeConfig,
+      },
+    );
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error("Transcription token generation error:", error);
+    res.status(500).json({ error: "Failed to generate transcription token" });
   }
 });
 

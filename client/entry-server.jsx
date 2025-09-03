@@ -1,11 +1,20 @@
 import { StrictMode } from "react";
 import { renderToString } from "react-dom/server";
-import App from "./components/App";
+import Index from "./pages/index";
+import Transcribe from "./pages/transcribe";
 
-export function render() {
+export function render(url) {
+  // Simple server-side routing
+  let Page;
+  if (url === "/transcribe") {
+    Page = Transcribe;
+  } else {
+    Page = Index;
+  }
+
   const html = renderToString(
     <StrictMode>
-      <App />
+      <Page />
     </StrictMode>,
   );
   return { html };
